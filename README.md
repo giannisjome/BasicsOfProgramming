@@ -35,4 +35,3 @@ The game is divided into modular functions for readability and maintainability:
 
 ## Pair Work
 This project was completed individually.
-> If done in a pair, mention both contributors and briefly describe who was responsible for what.
