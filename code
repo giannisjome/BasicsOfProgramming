@@ -1,0 +1,88 @@
+import random
+import os
+
+# Constants
+SCORE_FILE = "scores.txt"
+DIFFICULTY_SETTINGS = {
+    "easy": {"range": 20, "max_attempts": 10},
+    "medium": {"range": 50, "max_attempts": 7},
+    "hard": {"range": 100, "max_attempts": 5}
+}
+
+def choose_difficulty():
+    while True:
+        difficulty = input("Choose difficulty (easy, medium, hard): ").strip().lower()
+        if difficulty in DIFFICULTY_SETTINGS:
+            return DIFFICULTY_SETTINGS[difficulty]
+        else:
+            print("Invalid choice. Please select easy, medium, or hard.")
+
+def get_guess(range_max):
+    while True:
+        try:
+            guess = int(input(f"Enter your guess (1 to {range_max}): "))
+            if 1 <= guess <= range_max:
+                return guess
+            else:
+                print(f"Please enter a number between 1 and {range_max}.")
+        except ValueError:
+            print("That's not a valid number.")
+
+def play_game():
+    settings = choose_difficulty()
+    target = random.randint(1, settings["range"])
+    attempts = 0
+    guesses = []
+
+    print(f"\nGuess the number between 1 and {settings['range']}!")
+
+    while attempts < settings["max_attempts"]:
+        guess = get_guess(settings["range"])
+        guesses.append(guess)
+        attempts += 1
+
+        if guess == target:
+            print(f"🎉 Correct! You guessed the number in {attempts} attempts.")
+            save_score(target, guesses)
+            return
+        elif guess < target:
+            print("Too low.")
+        else:
+            print("Too high.")
+
+    print(f"😞 You've used all {settings['max_attempts']} attempts. The number was {target}.")
+    save_score(target, guesses, success=False)
+
+def save_score(target, guesses, success=True):
+    with open(SCORE_FILE, "a") as f:
+        result = "WIN" if success else "LOSE"
+        f.write(f"{result} | Number: {target} | Guesses: {guesses}\n")
+
+def load_scores():
+    if not os.path.exists(SCORE_FILE):
+        print("No scores saved yet.")
+        return
+    with open(SCORE_FILE, "r") as f:
+        print("\n📄 Previous Games:")
+        print(f.read())
+
+def main_menu():
+    while True:
+        print("\n--- Number Guessing Game ---")
+        print("1. Play Game")
+        print("2. View Past Scores")
+        print("3. Exit")
+
+        choice = input("Choose an option: ").strip()
+        if choice == "1":
+            play_game()
+        elif choice == "2":
+            load_scores()
+        elif choice == "3":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid option. Try again.")
+
+# Start the program
+main_menu()
